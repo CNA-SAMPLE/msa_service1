@@ -1,9 +1,24 @@
-node {
-     stage('Clone repository') {
-         checkout scm #repository를 jenkins workspace로 clone
-     }
+pipeline {
+   agent any
+   stages {
+      stage('clone repo') {
+          steps {
+              withCredentials(usernamePassword(credentialsId :jenkins-user-github ,passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME' )){
+              // Get some code from a GitHub repository
+              bat("""
+              git config --global credential.username {GIT_USERNAME}
+              git config --global credential.helper "!echo password={GIT_PASSWORD}; echo"
+              git clone https://github.com/aakashsehgal/FMU.git
 
-     stage('Build image') {
-         app = docker.build("demo/demo:$BUILD_NUMBER") #docker image build 및 이름을 teicahe/jenkins:빌드번호 설정
-     }
+              echo "pulled the code"
+              """)
+
+          }
+
+
+         }
+
+         }
+      }
+
 }
