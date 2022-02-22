@@ -1,25 +1,41 @@
-#!/usr/bin/env groovy
 pipeline {
-   agent any
-   stages {
-      stage('clone repo') {
-          steps {
-              withCredentials(usernamePassword(credentialsId :jenkins-user-github ,passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME' )){
-              // Get some code from a GitHub repository
-              bat("""
-              git config --global credential.username {GIT_USERNAME}
-              git config --global credential.helper "!echo password={GIT_PASSWORD}; echo"
-              git clone https://github.com/aakashsehgal/FMU.git
+  environment {
+    imagename = "demo/demo"
+    registryCredential = 'yyouri'
+    dockerImage = ''
+  }
+  agent any
+  stages {
+    stage('Cloning Git') {
+      steps {
+        git([url: 'https://github.com/ismailyenigul/hacicenkins.git', branch: 'master', credentialsId: 'ismailyenigul-github-user-token'])
 
-              echo "pulled the code"
-              """)
+      }
+    }
+    stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build imagename
+        }
+      }
+    }
+    stage('Deploy Image') {
+      steps{
+        script {
+          docker.withRegistry( '', registryCredential ) {
+            dockerImage.push("$BUILD_NUMBER")
+             dockerImage.push('latest')
 
           }
-
-
-         }
-
-         }
+        }
       }
+    }
+    stage('Remove Unused docker image') {
+      steps{
+        sh "docker rmi $imagename:$BUILD_NUMBER"
+         sh "docker rmi $imagename:latest"
 
+      }
+    }
+  }
 }
