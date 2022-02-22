@@ -9,7 +9,6 @@ pipeline {
     stage('Cloning Git') {
       steps {
         git([url: 'https://github.com/CNA-SAMPLE/msa_service1.git', branch: 'main', credentialsId: 'yyouri'])
-
       }
     }
     stage('Building image') {
