@@ -21,7 +21,7 @@ pipeline {
                 git 'https://github.com/CNA-SAMPLE/msa_service1.git' 
 
             }
-13
+
         } 
 
         stage('Building our image') { 
