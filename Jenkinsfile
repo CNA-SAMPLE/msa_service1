@@ -17,7 +17,7 @@ pipeline {
         stage('Cloning our Git') { 
 
             steps { 
-
+                echo "Cloning our Git"
                 git 'https://github.com/CNA-SAMPLE/msa_service1.git' 
 
             }
